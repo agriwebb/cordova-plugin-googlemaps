@@ -36,9 +36,9 @@ var BaseClass = function() {
         return key in _vars ? _vars[key] : null;
     };
     self.set = function(key, value) {
-        if (_vars[key] !== value) {
-            self.trigger(key + "_changed", _vars[key], value);
-        }
+        // if (_vars[key] !== value) {
+        //     self.trigger(key + "_changed", _vars[key], value);
+        // }
         _vars[key] = value;
     };
 
