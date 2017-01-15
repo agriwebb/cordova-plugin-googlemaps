@@ -328,13 +328,13 @@ NSDictionary *initOptions;
  * @callback the my location button is clicked.
  */
 - (void)mapView:(GMSMapView *)mapView didTapAtCoordinate:(CLLocationCoordinate2D)coordinate {
-  [self triggerMapEvent:@"click" coordinate:coordinate];
+  [self triggerMapEvent:@"map_click" coordinate:coordinate];
 }
 /**
  * @callback map long_click
  */
 - (void) mapView:(GMSMapView *)mapView didLongPressAtCoordinate:(CLLocationCoordinate2D)coordinate {
-  [self triggerMapEvent:@"long_click" coordinate:coordinate];
+  [self triggerMapEvent:@"map_long_click" coordinate:coordinate];
 }
 
 /**
@@ -382,28 +382,28 @@ NSDictionary *initOptions;
  */
 - (void) mapView:(GMSMapView *) mapView didBeginDraggingMarker:(GMSMarker *)marker
 {
-  [self triggerMarkerEvent:@"drag_start" marker:marker];
+  [self triggerMarkerEvent:@"marker_drag_start" marker:marker];
 }
 /**
  * @callback marker drag_end
  */
 - (void) mapView:(GMSMapView *) mapView didEndDraggingMarker:(GMSMarker *)marker
 {
-  [self triggerMarkerEvent:@"drag_end" marker:marker];
+  [self triggerMarkerEvent:@"marker_drag_end" marker:marker];
 }
 /**
  * @callback marker drag
  */
 - (void) mapView:(GMSMapView *) mapView didDragMarker:(GMSMarker *)marker
 {
-  [self triggerMarkerEvent:@"drag" marker:marker];
+  [self triggerMarkerEvent:@"marker_drag" marker:marker];
 }
 
 /**
  * @callback marker click
  */
 - (BOOL)mapView:(GMSMapView *)mapView didTapMarker:(GMSMarker *)marker {
-  [self triggerMarkerEvent:@"click" marker:marker];
+  [self triggerMarkerEvent:@"marker_click" marker:marker];
 
   
   NSString *markerPropertyId = [NSString stringWithFormat:@"marker_property_%lu", (unsigned long)marker.hash];
