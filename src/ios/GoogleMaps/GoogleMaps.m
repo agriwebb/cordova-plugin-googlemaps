@@ -228,67 +228,63 @@
 
 
 - (void)exec:(CDVInvokedUrlCommand *)command {
+    CDVPluginResult* pluginResult = nil;
+    NSString *classAndMethod = [command.arguments objectAtIndex:0];
 
-    [self.commandDelegate runInBackground:^{
+    NSArray *target = [classAndMethod componentsSeparatedByString:@"."];
+    NSString *className = [target objectAtIndex:0];
+    CDVPlugin<MyPlgunProtocol> *pluginClass = nil;
+    NSString *methodName;
+    if (self.mapCtrl.debuggable) {
+        NSLog(@"(debug)%@", classAndMethod);
+    }
 
-        CDVPluginResult* pluginResult = nil;
-        NSString *classAndMethod = [command.arguments objectAtIndex:0];
-
-        NSArray *target = [classAndMethod componentsSeparatedByString:@"."];
-        NSString *className = [target objectAtIndex:0];
-        CDVPlugin<MyPlgunProtocol> *pluginClass = nil;
-        NSString *methodName;
-        if (self.mapCtrl.debuggable) {
-            NSLog(@"(debug)%@", classAndMethod);
+    if ([classAndMethod isEqualToString:@"Map.setOptions"]) {
+        NSDictionary *options = [command.arguments objectAtIndex:1];
+        if ([options objectForKey:@"backgroundColor"]) {
+            NSArray *rgbColor = [options objectForKey:@"backgroundColor"];
+            self.pluginLayer.backgroundColor = [rgbColor parsePluginColor];
         }
+    }
 
-        if ([classAndMethod isEqualToString:@"Map.setOptions"]) {
-            NSDictionary *options = [command.arguments objectAtIndex:1];
-            if ([options objectForKey:@"backgroundColor"]) {
-                NSArray *rgbColor = [options objectForKey:@"backgroundColor"];
-                self.pluginLayer.backgroundColor = [rgbColor parsePluginColor];
-            }
-        }
+    if ([target count] == 2) {
+        methodName = [NSString stringWithFormat:@"%@:", [target objectAtIndex:1]];
 
-        if ([target count] == 2) {
-            methodName = [NSString stringWithFormat:@"%@:", [target objectAtIndex:1]];
-
-            pluginClass = [self.mapCtrl.plugins objectForKey:className];
-            if (!pluginClass) {
+        pluginClass = [self.mapCtrl.plugins objectForKey:className];
+        if (!pluginClass) {
 #if CORDOVA_VERSION_MIN_REQUIRED >= __CORDOVA_4_0_0
-                pluginClass = [(CDVViewController*)self.viewController getCommandInstance:className];
+            pluginClass = [(CDVViewController*)self.viewController getCommandInstance:className];
 #else
-                pluginClass = [[NSClassFromString(className)alloc] initWithWebView:self.webView];
+            pluginClass = [[NSClassFromString(className)alloc] initWithWebView:self.webView];
 #endif
-                if (pluginClass) {
-                    pluginClass.commandDelegate = self.commandDelegate;
-                    [pluginClass setGoogleMapsViewController:self.mapCtrl];
-                    [self.mapCtrl.plugins setObject:pluginClass forKey:className];
-                }
+            if (pluginClass) {
+                pluginClass.commandDelegate = self.commandDelegate;
+                [pluginClass setGoogleMapsViewController:self.mapCtrl];
+                [self.mapCtrl.plugins setObject:pluginClass forKey:className];
             }
-            if (!pluginClass) {
-
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
-                                                 messageAsString:[NSString stringWithFormat:@"Class not found: %@", className]];
-                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-                return;
-
-            } else {
-                SEL selector = NSSelectorFromString(methodName);
-                if ([pluginClass respondsToSelector:selector]){
-                    [pluginClass performSelectorOnMainThread:selector withObject:command waitUntilDone:YES];
-                } else {
-                    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
-                                                     messageAsString:[NSString stringWithFormat:@"method not found: %@ in %@ class", [target objectAtIndex:1], className]];
-                    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-                }
-            }
-        } else {
-            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
-                                             messageAsString:[NSString stringWithFormat:@"class not found: %@", className]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }
-    }];
+        if (!pluginClass) {
+
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+                                             messageAsString:[NSString stringWithFormat:@"Class not found: %@", className]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            return;
+
+        } else {
+            SEL selector = NSSelectorFromString(methodName);
+            if ([pluginClass respondsToSelector:selector]){
+                [pluginClass performSelectorOnMainThread:selector withObject:command waitUntilDone:YES];
+            } else {
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+                                                 messageAsString:[NSString stringWithFormat:@"method not found: %@ in %@ class", [target objectAtIndex:1], className]];
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            }
+        }
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+                                         messageAsString:[NSString stringWithFormat:@"class not found: %@", className]];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }
 }
 
 /**
