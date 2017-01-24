@@ -1472,7 +1472,7 @@ Marker.prototype.setFlat = function (flat) {
   this.set('flat', flat);
   cordova.exec(null, this.errorHandler, PLUGIN_NAME, 'exec', ['Marker.setFlat', this.getId(), flat]);
 };
-Marker.prototype.setIcon = function (url) {
+Marker.prototype.setIcon = function (url, callback) {
   var self = this;
   if (url && isHTMLColorString(url)) {
     url = HTMLColor2RGBA(url);
