@@ -1473,10 +1473,14 @@ Marker.prototype.setFlat = function (flat) {
   cordova.exec(null, this.errorHandler, PLUGIN_NAME, 'exec', ['Marker.setFlat', this.getId(), flat]);
 };
 Marker.prototype.setIcon = function (url) {
+  var self = this;
   if (url && isHTMLColorString(url)) {
     url = HTMLColor2RGBA(url);
   }
-  cordova.exec(null, this.errorHandler, PLUGIN_NAME, 'exec', ['Marker.setIcon', this.getId(), url]);
+  cordova.exec(function (result) {
+    if (callback)
+      callback(self, result);
+  }, this.errorHandler, PLUGIN_NAME, 'exec', ['Marker.setIcon', this.getId(), url]);
 };
 Marker.prototype.setTitle = function (title) {
   if (!title) {
@@ -1491,7 +1495,6 @@ Marker.prototype.setVisible = function (visible, callback) {
   visible = parseBoolean(visible);
   this.set('visible', visible);
   cordova.exec(function (result) {
-    console.log('setVisible return ', result);
     if (callback)
       callback(self, result);
   }, this.errorHandler, PLUGIN_NAME, 'exec', ['Marker.setVisible', this.getId(), visible]);
