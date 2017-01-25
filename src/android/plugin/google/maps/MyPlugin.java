@@ -103,7 +103,7 @@ public class MyPlugin extends CordovaPlugin implements MyPluginInterface  {
       e.printStackTrace();
       callbackContext.error(e.getMessage());
     }
-    this.sendNoResult(callbackContext);
+    callbackContext.success();
   }
   public void clear() {
     this.objects.clear();

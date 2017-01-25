@@ -655,7 +655,7 @@ public class PluginMarker extends MyPlugin {
 
         @Override
         public void onPostExecute(Object object) {
-          PluginMarker.this.sendNoResult(callbackContext);
+          callbackContext.success();
         }
 
         @Override
@@ -664,7 +664,7 @@ public class PluginMarker extends MyPlugin {
         }
       });
     } else {
-      this.sendNoResult(callbackContext);
+      callbackContext.success();
     }
   }
 
