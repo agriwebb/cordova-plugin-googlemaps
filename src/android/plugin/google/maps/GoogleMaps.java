@@ -1331,7 +1331,7 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
 
   @Override
   public boolean onMarkerClick(Marker marker) {
-    this.onMarkerEvent("click", marker);
+    this.onMarkerEvent("marker_click", marker);
 
     JSONObject properties = null;
     String propertyId = "marker_property_" + marker.getId();
@@ -1527,7 +1527,7 @@ public class GoogleMaps extends CordovaPlugin implements View.OnClickListener, O
     }
 
     // Only emit click event if no overlays hit
-    this.onMapEvent("click", point);
+    this.onMapEvent("map_click", point);
   }
 
   /**
